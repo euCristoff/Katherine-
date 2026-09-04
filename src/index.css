@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-script: 'Alex Brush', cursive;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --color-gold-50: #fdfbf7;
+  --color-gold-100: #f7f1e6;
+  --color-gold-200: #ece0cd;
+  --color-gold-300: #dec7a8;
+  --color-gold-400: #cca87e;
+  --color-gold-500: #b58d5f;
+  --color-gold-600: #a4794e;
+  --color-gold-700: #88603e;
+  --color-gold-800: #6f4f34;
+  --color-gold-900: #5b412c;
+}
+
+.font-script {
+  font-family: 'Alex Brush', cursive;
+}
+
+.font-serif-title {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* Smooth custom scrollbars and backdrop blur utilities */
+html {
+  scroll-behavior: smooth;
+}
+
