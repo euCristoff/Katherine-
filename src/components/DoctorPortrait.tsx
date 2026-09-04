@@ -1,22 +1,17 @@
-import { useState, useEffect, useRef, type ChangeEvent, type DragEvent, type MouseEvent } from 'react';
-import { Camera, Upload, Check, RotateCcw } from 'lucide-react';
-import { MEDIA_KEYS, getStoredMedia, saveStoredMedia, removeStoredMedia, fileToDataUrl } from '../utils/mediaStorage';
+import { useState, useEffect } from 'react';
+import { Check } from 'lucide-react';
+import { MEDIA_KEYS, getStoredMedia } from '../utils/mediaStorage';
 
 interface DoctorPortraitProps {
   className?: string;
-  showUploadBadge?: boolean;
   aspectRatio?: string;
 }
 
 export default function DoctorPortrait({
   className = '',
-  showUploadBadge = true,
   aspectRatio = 'aspect-[4/4.8]',
 }: DoctorPortraitProps) {
   const [mediaSrc, setMediaSrc] = useState<string | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadMedia = () => {
@@ -24,12 +19,11 @@ export default function DoctorPortrait({
       if (stored) {
         setMediaSrc(stored);
       } else {
-        // Also check if asset exists in public folder
+        // Check if asset exists in public folder
         const img = new Image();
         img.src = '/assets/dra-katherine.png';
         img.onload = () => setMediaSrc('/assets/dra-katherine.png');
         img.onerror = () => {
-          // Check alternative paths
           const img2 = new Image();
           img2.src = '/dra-katherine.png';
           img2.onload = () => setMediaSrc('/dra-katherine.png');
@@ -42,61 +36,10 @@ export default function DoctorPortrait({
     return () => window.removeEventListener('katherine-media-updated', loadMedia);
   }, []);
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const dataUrl = await fileToDataUrl(file);
-        saveStoredMedia(MEDIA_KEYS.HERO_DOCTOR, dataUrl);
-        setMediaSrc(dataUrl);
-      } catch (err) {
-        console.error('Error reading file:', err);
-      }
-    }
-  };
-
-  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      try {
-        const dataUrl = await fileToDataUrl(file);
-        saveStoredMedia(MEDIA_KEYS.HERO_DOCTOR, dataUrl);
-        setMediaSrc(dataUrl);
-      } catch (err) {
-        console.error('Error dropping file:', err);
-      }
-    }
-  };
-
-  const handleReset = (e: MouseEvent) => {
-    e.stopPropagation();
-    removeStoredMedia(MEDIA_KEYS.HERO_DOCTOR);
-    setMediaSrc(null);
-  };
-
   return (
     <div
-      className={`relative w-full ${aspectRatio} rounded-[160px_160px_40px_40px] overflow-hidden bg-gradient-to-b from-[#f8f4ee] via-[#efe5d7] to-[#e4d4c1] shadow-2xl border-4 border-white/90 group ${
-        isDragOver ? 'ring-4 ring-[#a4794e] ring-offset-4' : ''
-      } ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setIsDragOver(true);
-      }}
-      onDragLeave={() => setIsDragOver(false)}
-      onDrop={handleDrop}
+      className={`relative w-full ${aspectRatio} rounded-[160px_160px_40px_40px] overflow-hidden bg-gradient-to-b from-[#f8f4ee] via-[#efe5d7] to-[#e4d4c1] shadow-2xl border-4 border-white/90 group ${className}`}
     >
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-      />
 
       {mediaSrc ? (
         <img
@@ -265,7 +208,7 @@ export default function DoctorPortrait({
           >
             Dra. Katherine Cavalcante
           </p>
-          <p className="text-[11px] text-[#6e6358]">Ortodontia & HOF Especialista</p>
+          <p className="text-[11px] text-[#6e6358]">Ortodontia & Estética Dental</p>
         </div>
 
         <div className="flex flex-col items-end gap-1">
@@ -279,37 +222,6 @@ export default function DoctorPortrait({
           </span>
         </div>
       </div>
-
-      {/* Optional Quick Upload / Drop Trigger */}
-      {showUploadBadge && (
-        <div
-          className={`absolute top-4 right-4 z-30 transition-all duration-200 ${
-            isHovered || isDragOver ? 'opacity-100 translate-y-0' : 'opacity-85 sm:opacity-0 sm:translate-y-1'
-          }`}
-        >
-          <div className="flex items-center gap-1.5 bg-[#2a241f]/85 backdrop-blur-md text-white px-3 py-1.5 rounded-xl shadow-lg border border-white/20">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 text-xs font-medium hover:text-[#d8b58f] transition-colors cursor-pointer"
-              title="Clique para carregar a foto oficial da Dra. Katherine"
-            >
-              <Camera className="w-3.5 h-3.5 text-[#e7c7a5]" />
-              <span>{mediaSrc ? 'Trocar Foto' : 'Carregar Foto'}</span>
-            </button>
-            {mediaSrc && (
-              <button
-                type="button"
-                onClick={handleReset}
-                className="text-white/60 hover:text-white ml-1 p-0.5"
-                title="Restaurar padrão"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

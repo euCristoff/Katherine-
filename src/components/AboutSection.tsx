@@ -17,7 +17,7 @@ export default function AboutSection() {
           {/* Doctor Portrait / Clinical Image */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-[420px]">
-              <DoctorPortrait showUploadBadge={false} aspectRatio="aspect-[4/4.9]" />
+              <DoctorPortrait aspectRatio="aspect-[4/4.9]" />
             </div>
 
             {/* Experience badge */}

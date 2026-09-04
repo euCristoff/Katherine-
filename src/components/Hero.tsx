@@ -129,7 +129,7 @@ export default function Hero({ onSelectService }: HeroProps) {
           {/* Right Column: Dra. Katherine Portrait Composition */}
           <div className="lg:col-span-6 xl:col-span-6 flex justify-center lg:justify-end relative mt-6 lg:mt-0">
             <div className="relative w-full max-w-[460px] lg:max-w-[500px]">
-              <DoctorPortrait showUploadBadge={true} aspectRatio="aspect-[4/4.8]" />
+              <DoctorPortrait aspectRatio="aspect-[4/4.8]" />
             </div>
           </div>
         </div>
