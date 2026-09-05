@@ -1,53 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { MEDIA_KEYS, getStoredMedia } from '../utils/mediaStorage';
-import defaultDoctorPhoto from '../assets/dra-katherine.png';
+import draKatherinePhoto from '../assets/dra-katherine.png';
 
 interface DoctorPortraitProps {
   className?: string;
   aspectRatio?: string;
 }
 
-const FALLBACK_CDN_PHOTO = 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1000&q=85';
-
 export default function DoctorPortrait({
   className = '',
   aspectRatio = 'aspect-[4/4.8]',
 }: DoctorPortraitProps) {
-  const [mediaSrc, setMediaSrc] = useState<string>(defaultDoctorPhoto);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Check if user uploaded custom media in localStorage
-    const stored = getStoredMedia(MEDIA_KEYS.HERO_DOCTOR);
-    if (stored) {
-      setMediaSrc(stored);
-      // Automatically synchronize the photo to project files on the server
-      if (stored.startsWith('data:image')) {
-        fetch('/api/save-doctor-photo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageBase64: stored }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.success) {
-              console.log('Real photo of Dra. Katherine successfully saved into project files!');
-            }
-          })
-          .catch((err) => console.error('Sync failed', err));
-      }
-    } else {
-      setMediaSrc(defaultDoctorPhoto);
-    }
-  }, []);
-
-  const handleImageError = () => {
-    // If the local bundled photo fails, fallback to CDN
-    if (mediaSrc !== FALLBACK_CDN_PHOTO) {
-      setMediaSrc(FALLBACK_CDN_PHOTO);
-    }
-  };
 
   return (
     <div
@@ -58,13 +22,12 @@ export default function DoctorPortrait({
         <div className="absolute inset-0 bg-gradient-to-b from-[#faf6f0] via-[#f2e9dc] to-[#e5d4be] animate-pulse" />
       )}
 
-      {/* Real professional photograph of Dra. Katherine Cavalcante */}
+      {/* Official permanent photograph of Dra. Katherine Cavalcante */}
       <img
-        src={mediaSrc}
+        src={draKatherinePhoto}
         alt="Dra. Katherine Cavalcante - Cirurgiã-Dentista Especialista"
         referrerPolicy="no-referrer"
         onLoad={() => setImageLoaded(true)}
-        onError={handleImageError}
         className={`w-full h-full object-cover object-top transition-all duration-700 group-hover:scale-105 ${
           imageLoaded ? 'opacity-100' : 'opacity-0'
         }`}
