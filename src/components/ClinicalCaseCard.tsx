@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, type MouseEvent, type TouchEvent, type ChangeEvent, type DragEvent } from 'react';
-import { Camera, Upload, RotateCcw, Check, Sparkles, ShieldCheck, MessageCircle, ArrowRight } from 'lucide-react';
-import { getStoredMedia, saveStoredMedia, removeStoredMedia, fileToDataUrl } from '../utils/mediaStorage';
+import { useState, useEffect, type MouseEvent, type TouchEvent } from 'react';
+import { Sparkles, ShieldCheck, MessageCircle, ArrowRight } from 'lucide-react';
+import { getStoredMedia } from '../utils/mediaStorage';
 import { WHATSAPP_BASE_URL } from '../data/dentistData';
 
 interface ClinicalCaseCardProps {
@@ -31,9 +31,6 @@ export default function ClinicalCaseCard({
 }: ClinicalCaseCardProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [sliderPos, setSliderPos] = useState(50);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadMedia = () => {
@@ -57,40 +54,6 @@ export default function ClinicalCaseCard({
     return () => window.removeEventListener('katherine-media-updated', loadMedia);
   }, [storageKey, fallbackFilename]);
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const dataUrl = await fileToDataUrl(file);
-        saveStoredMedia(storageKey, dataUrl);
-        setImageSrc(dataUrl);
-      } catch (err) {
-        console.error('Error loading case image:', err);
-      }
-    }
-  };
-
-  const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      try {
-        const dataUrl = await fileToDataUrl(file);
-        saveStoredMedia(storageKey, dataUrl);
-        setImageSrc(dataUrl);
-      } catch (err) {
-        console.error('Error dropping case image:', err);
-      }
-    }
-  };
-
-  const handleReset = (e: MouseEvent) => {
-    e.stopPropagation();
-    removeStoredMedia(storageKey);
-    setImageSrc(null);
-  };
-
   const handleSliderMove = (e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -106,26 +69,8 @@ export default function ClinicalCaseCard({
   return (
     <div
       id={caseId}
-      className={`bg-white rounded-3xl overflow-hidden shadow-md shadow-[#4a3b2c]/5 border border-[#ebe0d3] hover:shadow-xl transition-all duration-300 flex flex-col group ${
-        isDragOver ? 'ring-4 ring-[#a4794e] ring-offset-2' : ''
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setIsDragOver(true);
-      }}
-      onDragLeave={() => setIsDragOver(false)}
-      onDrop={handleDrop}
+      className="bg-white rounded-3xl overflow-hidden shadow-md shadow-[#4a3b2c]/5 border border-[#ebe0d3] hover:shadow-xl transition-all duration-300 flex flex-col group"
     >
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-      />
-
       {/* Case Header Card Bar */}
       <div className="p-5 sm:p-6 pb-4 border-b border-[#f3eae0] flex items-center justify-between gap-3">
         <div>
@@ -142,29 +87,6 @@ export default function ClinicalCaseCard({
           >
             {title}
           </h3>
-        </div>
-
-        {/* Upload / Change Action Trigger */}
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-[#f5efe7] text-[#7a5e42] hover:bg-[#ebdccb] hover:text-[#523d29] transition-colors cursor-pointer border border-[#ebdccb]"
-            title="Arraste ou clique para carregar a imagem do Instagram deste caso"
-          >
-            <Camera className="w-3.5 h-3.5 text-[#a4794e]" />
-            <span className="hidden sm:inline">{imageSrc ? 'Substituir' : 'Carregar Imagem'}</span>
-          </button>
-          {imageSrc && (
-            <button
-              type="button"
-              onClick={handleReset}
-              className="p-1.5 rounded-lg text-[#9e9083] hover:text-[#2a241f] hover:bg-[#f5efe7]"
-              title="Restaurar visual padrão"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
       </div>
 

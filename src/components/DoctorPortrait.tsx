@@ -18,10 +18,25 @@ export default function DoctorPortrait({
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check if user uploaded a custom media in localStorage
+    // Check if user uploaded custom media in localStorage
     const stored = getStoredMedia(MEDIA_KEYS.HERO_DOCTOR);
     if (stored) {
       setMediaSrc(stored);
+      // Automatically synchronize the photo to project files on the server
+      if (stored.startsWith('data:image')) {
+        fetch('/api/save-doctor-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: stored }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              console.log('Real photo of Dra. Katherine successfully saved into project files!');
+            }
+          })
+          .catch((err) => console.error('Sync failed', err));
+      }
     } else {
       setMediaSrc(defaultDoctorPhoto);
     }
