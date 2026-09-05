@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import draKatherinePhoto from '../assets/dra-katherine.png';
+import draKatherineWebp from '../assets/dra-katherine.webp';
+import draKatherineJpg from '../assets/dra-katherine.jpg';
 
 interface DoctorPortraitProps {
   className?: string;
@@ -11,7 +12,7 @@ export default function DoctorPortrait({
   className = '',
   aspectRatio = 'aspect-[4/4.8]',
 }: DoctorPortraitProps) {
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(true);
 
   return (
     <div
@@ -23,15 +24,20 @@ export default function DoctorPortrait({
       )}
 
       {/* Official permanent photograph of Dra. Katherine Cavalcante */}
-      <img
-        src={draKatherinePhoto}
-        alt="Dra. Katherine Cavalcante - Cirurgiã-Dentista Especialista"
-        referrerPolicy="no-referrer"
-        onLoad={() => setImageLoaded(true)}
-        className={`w-full h-full object-cover object-top transition-all duration-700 group-hover:scale-105 ${
-          imageLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
+      <picture className="w-full h-full block">
+        <source srcSet={draKatherineWebp} type="image/webp" />
+        <source srcSet={draKatherineJpg} type="image/jpeg" />
+        <img
+          src={draKatherineJpg}
+          alt="Dra. Katherine Cavalcante - Cirurgiã-Dentista Especialista"
+          loading="eager"
+          decoding="async"
+          onLoad={() => setImageLoaded(true)}
+          className={`w-full h-full object-cover object-top transition-all duration-700 group-hover:scale-105 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      </picture>
 
       {/* Top collar badge */}
       <div className="absolute top-4 left-0 right-0 flex justify-center z-20 pointer-events-none">
